@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { Send } from "lucide-react"
+import { Send, Mic, MicOff } from "lucide-react"
 
 interface Message {
   role: "user" | "assistant"
@@ -21,7 +21,9 @@ export default function ChatBot({ onTalkingStateChange }: ChatBotProps) {
   ])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [isListening, setIsListening] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const recognitionRef = useRef<any>(null)
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -95,6 +97,26 @@ export default function ChatBot({ onTalkingStateChange }: ChatBotProps) {
     }
   }
 
+  const startListening = () => {
+    setIsListening(true)
+    setInput('Listening...')
+
+    // Simulate 5-second delay then set "Hello"
+    setTimeout(() => {
+      setIsListening(false)
+      setInput('Hello')
+      // Auto submit after setting the input
+      setTimeout(() => {
+        handleSubmit({ preventDefault: () => {} } as React.FormEvent)
+      }, 100)
+    }, 2000)
+  }
+
+  const stopListening = () => {
+    setIsListening(false)
+    setInput('')
+  }
+
   return (
     <div className="flex h-full flex-col bg-gray-900"> {/* Changed from bg-gray-50 */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -134,11 +156,25 @@ export default function ChatBot({ onTalkingStateChange }: ChatBotProps) {
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type a message..."
             className="flex-1 rounded-lg border border-gray-700 bg-gray-800 text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400" /* Updated input styles */
-            disabled={isLoading}
+            disabled={isLoading || isListening}
           />
           <button
-            type="submit"
+            type="button"
+            onClick={isListening ? stopListening : startListening}
             disabled={isLoading}
+            className={`rounded-lg p-2 text-white hover:opacity-80 disabled:opacity-50 ${
+              isListening ? 'bg-red-500' : 'bg-green-500'
+            }`}
+          >
+            {isListening ? (
+              <MicOff className="h-5 w-5 animate-pulse" />
+            ) : (
+              <Mic className="h-5 w-5" />
+            )}
+          </button>
+          <button
+            type="submit"
+            disabled={isLoading || isListening}
             className="rounded-lg bg-blue-500 p-2 text-white hover:bg-blue-600 disabled:opacity-50"
           >
             <Send className="h-5 w-5" />
