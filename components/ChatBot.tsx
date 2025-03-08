@@ -54,7 +54,7 @@ export default function ChatBot({ onTalkingStateChange }: ChatBotProps) {
         body: JSON.stringify({
           model: "dhenu2-in-8b-preview", 
           messages: [
-            { role: "system", content: "You are a helpful AI assistant." },
+            { role: "system", content: "You are a helpful Sanjaya Farming assistant." },
             ...messages,
             { role: "user", content: userMessage }
           ],
@@ -101,10 +101,9 @@ export default function ChatBot({ onTalkingStateChange }: ChatBotProps) {
     setIsListening(true)
     setInput('Listening...')
 
-    // Simulate 5-second delay then set "Hello"
     setTimeout(() => {
       setIsListening(false)
-      setInput('Hello')
+      setInput('What should I keep in Mind while Growing Tomatoes?')
       // Auto submit after setting the input
       setTimeout(() => {
         handleSubmit({ preventDefault: () => {} } as React.FormEvent)
@@ -154,7 +153,6 @@ export default function ChatBot({ onTalkingStateChange }: ChatBotProps) {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Type a message..."
             className="flex-1 rounded-lg border border-gray-700 bg-gray-800 text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400" /* Updated input styles */
             disabled={isLoading || isListening}
           />

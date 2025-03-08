@@ -83,7 +83,7 @@ export default function KioskDevice({ children }: KioskDeviceProps) {
                   <div className="relative h-16 rounded-xl bg-gray-900 p-3 ring-1 ring-gray-700">
                     <div className="flex h-full items-center justify-center">
                       <div className="text-center">
-                        <p className="text-sm font-medium text-gray-400">SANJAYA</p>
+                        <p className="text-2xl font-medium text-gray-400">SANJAYA</p>
                       </div>
                     </div>
                     {/* Drawer handle */}
