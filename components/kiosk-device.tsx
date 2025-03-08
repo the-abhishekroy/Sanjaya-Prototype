@@ -87,7 +87,7 @@ export default function KioskDevice({ children }: KioskDeviceProps) {
                       </div>
                     </div>
                     {/* Drawer handle */}
-                    <div className="absolute bottom-2 left-1/2 h-1 w-12 -translate-x-1/2 transform rounded-full bg-gray-800"></div>
+                    {/* <div className="absolute bottom-2 left-1/2 h-1 w-12 -translate-x-1/2 transform rounded-full bg-gray-800"></div> */}
                     {/* Glow effect */}
                     <div className="absolute inset-x-0 bottom-0 h-px bg-blue-500/30 blur-sm"></div>
                   </div>

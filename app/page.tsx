@@ -5,8 +5,12 @@ import KioskDevice from "@/components/kiosk-device"
 import FaceScanner from "@/components/face-scanner"
 import HomeScreen from "@/components/home-screen"
 import ChatInterface from "@/components/chat-interface"
+import Marketplace from "@/components/marketplace"
+import Automation from "@/components/automation"
+import Weather from "@/components/weather"
+import Learn from "@/components/learn"
 
-type ViewType = 'home' | 'chatbot';
+type ViewType = 'home' | 'chatbot' | 'marketplace' | 'automation' | 'weather' | 'learn';
 
 export default function Home() {
   const [scanComplete, setScanComplete] = useState(false)
@@ -21,8 +25,8 @@ export default function Home() {
   }
 
   const handleNavigation = (view: ViewType) => {
-    setShowHome(true) // Ensure home is shown before navigation
     setCurrentView(view)
+    setShowHome(true)
   }
 
   const renderContent = () => {
@@ -33,40 +37,27 @@ export default function Home() {
     if (!showHome) {
       return (
         <div className="flex h-full items-center justify-center bg-gray-900 text-white">
-          <div className="text-center">
-            <div className="mb-4 text-blue-500">
-              <svg
-                className="mx-auto h-16 w-16 animate-pulse"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <h2 className="text-xl font-bold text-blue-400">Scan Complete</h2>
-            <p className="mt-2 text-sm text-gray-400">Initializing Sanjaya Assistant...</p>
-          </div>
+          {/* ...existing loading screen JSX... */}
         </div>
       )
     }
 
-    // Only render these components after showHome is true
-    if (showHome) {
-      return currentView === 'home' ? (
-        <HomeScreen onNavigate={handleNavigation} />
-      ) : (
-        <ChatInterface onBack={() => handleNavigation('home')} />
-      )
+    switch (currentView) {
+      case 'home':
+        return <HomeScreen onNavigate={handleNavigation} />
+      case 'chatbot':
+        return <ChatInterface onBack={() => handleNavigation('home')} />
+      case 'marketplace':
+        return <Marketplace onBack={() => handleNavigation('home')} />
+      case 'automation':
+        return <Automation onBack={() => handleNavigation('home')} />
+      case 'weather':
+        return <Weather onBack={() => handleNavigation('home')} />
+      case 'learn':
+        return <Learn onBack={() => handleNavigation('home')} />
+      default:
+        return <HomeScreen onNavigate={handleNavigation} />
     }
-
-    return null // Fallback return
   }
 
   return (
