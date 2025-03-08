@@ -10,33 +10,33 @@ export default function KioskDevice({ children }: KioskDeviceProps) {
       {/* Outer device body */}
       <div className="relative mx-auto">
         {/* Add soil tester box and connecting wire */}
-        <div className="absolute right-[-120px] bottom-20">
+        <div className="absolute right-[52px] bottom-8">
           {/* Connecting wire */}
-          <div className="absolute left-[-80px] top-1/2 h-[2px] w-[80px] -translate-y-1/2 bg-gradient-to-r from-gray-600 to-gray-700">
+          <div className="absolute left-[-80px] top-1/2 h-[4px] w-[80px] -translate-y-1/2 bg-gradient-to-r from-gray-600 to-gray-700">
           
             {/* Wire glow effect */}
             <div className="absolute inset-0 bg-blue-500/20 blur-sm"></div>
           </div>
 
           {/* Soil tester box */}
-          <div className="relative h-[120px] w-[100px] rounded-xl bg-[#2c3038] p-3 shadow-lg ring-1 ring-[#404246]">
+          <div className="relative h-[160px] w-[140px] rounded-xl bg-[#2c3038] p-4 shadow-lg ring-1 ring-[#404246]">
             {/* Sensor area */}
-            <div className="mb-2 h-1/2 rounded-lg bg-gray-900 p-2 ring-1 ring-gray-700">
+            <div className="mb-3 h-1/2 rounded-lg bg-gray-900 p-2 ring-1 ring-gray-700">
               <div className="h-full w-full rounded-md bg-gray-800">
                 <div className="h-full w-full animate-pulse rounded-md bg-blue-500/10"></div>
               </div>
             </div>
             {/* Status indicators */}
-            <div className="space-y-2">
+            <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <div className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse"></div>
+                <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
                 <div className="h-px flex-1 mx-2 bg-gray-700"></div>
-                <div className="text-xs text-gray-400">READY</div>
+                <div className="text-sm text-gray-400">READY</div>
               </div>
               <div className="flex items-center justify-between">
-                {/* <div className="h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse"></div> */}
-                {/* <div className="h-px flex-1 mx-2 bg-gray-700"></div> */}
-                <div className="text-xs text-gray-400">SOIL TESTER </div>
+                {/* <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse"></div>
+                <div className="h-px flex-1 mx-2 bg-gray-700"></div> */}
+                <div className="text-sm text-gray-400">SOIL TESTER</div>
               </div>
             </div>
           </div>
