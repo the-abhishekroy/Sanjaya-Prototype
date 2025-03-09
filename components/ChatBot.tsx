@@ -2,6 +2,36 @@
 
 import { useState, useRef, useEffect } from "react"
 import { Send, Mic, MicOff } from "lucide-react"
+import { GoogleGenerativeAI } from "@google/generative-ai"
+import ReactMarkdown from 'react-markdown'
+
+// Initialize Gemini with api key
+const genAI = new GoogleGenerativeAI("AIzaSyCPz6mnZ3IxUtVTwpAKFqL8J9P107o7PwA")
+
+// Create chat model
+const model = genAI.getGenerativeModel({ 
+  model: "gemini-2.0-flash",
+})
+
+// Create chat instance
+const chat = model.startChat({
+  history: [
+    {
+      role: "user",
+      parts: "You are Sanjaya, a farming AI assistant. You only answer questions related to farming, agriculture, and crops. Keep responses focused and practical.",
+    },
+    {
+      role: "model",
+      parts: "I understand. I am Sanjaya, your farming assistant. I will focus only on providing helpful information about farming, agriculture, and crops. How can I assist you today?"
+    }
+  ],
+  generationConfig: {
+    maxOutputTokens: 8192,
+    temperature: 0.9,
+    topP: 0.95,
+    topK: 40,
+  }
+})
 
 interface Message {
   role: "user" | "assistant"
@@ -12,11 +42,33 @@ interface ChatBotProps {
   onTalkingStateChange: (talking: boolean) => void
 }
 
+const formatResponse = (text: string) => {
+  // First, replace markdown headers with HTML headers
+  text = text.replace(/^#\s+(.*)$/gm, '<h3 class="text-lg font-medium text-blue-400 mt-4">$1</h3>')
+  
+  // Replace numbered lists with proper formatting
+  text = text.replace(/^\d+\.\s+(.*)$/gm, '<div class="mt-3"><strong>$1</strong></div>')
+  
+  // Replace bullet points with proper formatting
+  text = text.replace(/^\*\s+(.*)$/gm, '<div class="ml-4 mt-2">• $1</div>')
+  
+  // Replace bold text
+  text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+  
+  // Add paragraph breaks
+  text = text.split('\n\n').map(paragraph => {
+    if (paragraph.trim().startsWith('<')) return paragraph
+    return `<p class="mt-3">${paragraph}</p>`
+  }).join('')
+  
+  return text
+}
+
 export default function ChatBot({ onTalkingStateChange }: ChatBotProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "👋 Hi! I'm your Farming AI assistant. Say Hi! to Start "
+      content: "👋 Hi! I'm Sanjaya, your Farming AI assistant. Ask me anything about farming!"
     }
   ])
   const [input, setInput] = useState("")
@@ -39,56 +91,26 @@ export default function ChatBot({ onTalkingStateChange }: ChatBotProps) {
 
     const userMessage = input.trim()
     setInput("")
-    setMessages((prev) => [...prev, { role: "user", content: userMessage }])
+    setMessages(prev => [...prev, { role: "user", content: userMessage }])
     setIsLoading(true)
     onTalkingStateChange(true)
 
     try {
-      const response = await fetch("https://api.dhenu.ai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer dh-NI7ce0aFMx8M2ByJ8AVNxsFpnd3o-Q-sU3VPkpE84MA",
-          "Accept": "application/json"
-        },
-        body: JSON.stringify({
-          model: "dhenu2-in-8b-preview", 
-          messages: [
-            { role: "system", content: "You are a helpful Sanjaya Farming assistant." },
-            ...messages,
-            { role: "user", content: userMessage }
-          ],
-          temperature: 0.7,
-          max_tokens: 1000
-        }),
-      })
+      // Fixed: Send message with correct format
+      const result = await chat.sendMessage(userMessage)
+      const assistantMessage = formatResponse(result.response.text())
 
-      const data = await response.json()
-      
-      // Debug logging
-      console.log("API Response:", data)
-
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status} - ${JSON.stringify(data)}`)
-      }
-
-      if (!data.choices?.[0]?.message?.content) {
-        throw new Error("Invalid response format from API")
-      }
-
-      const assistantMessage = data.choices[0].message.content
-
-      setMessages((prev) => [
+      setMessages(prev => [
         ...prev,
         { role: "assistant", content: assistantMessage }
       ])
     } catch (error) {
-      console.error("Detailed error:", error)
-      setMessages((prev) => [
+      console.error("Chat error:", error)
+      setMessages(prev => [
         ...prev,
         {
           role: "assistant",
-          content: `Error: ${"Unknown error occurred"}`
+          content: "I apologize, but I'm having trouble processing your request. Please try again."
         }
       ])
     } finally {
@@ -117,7 +139,7 @@ export default function ChatBot({ onTalkingStateChange }: ChatBotProps) {
   }
 
   return (
-    <div className="flex h-full flex-col bg-gray-900"> {/* Changed from bg-gray-50 */}
+    <div className="flex h-full flex-col bg-gray-900">
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message, index) => (
           <div
@@ -130,16 +152,15 @@ export default function ChatBot({ onTalkingStateChange }: ChatBotProps) {
               className={`max-w-[80%] rounded-lg px-4 py-2 ${
                 message.role === "user"
                   ? "bg-blue-500 text-white"
-                  : "bg-gray-800 text-white shadow" /* Changed from bg-white text-gray-800 */
+                  : "bg-gray-800 text-white shadow [&_p]:mt-3 [&_strong]:text-blue-400 [&_h3]:mb-2"
               }`}
-            >
-              {message.content}
-            </div>
+              dangerouslySetInnerHTML={{ __html: message.content }}
+            />
           </div>
         ))}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-gray-800 text-white rounded-lg px-4 py-2 shadow"> {/* Changed from bg-white text-gray-800 */}
+            <div className="bg-gray-800 text-white rounded-lg px-4 py-2 shadow">
               Thinking...
             </div>
           </div>
@@ -147,13 +168,13 @@ export default function ChatBot({ onTalkingStateChange }: ChatBotProps) {
         <div ref={messagesEndRef} />
       </div>
 
-      <form onSubmit={handleSubmit} className="border-t border-gray-800 bg-gray-900 p-4"> {/* Changed from bg-white */}
+      <form onSubmit={handleSubmit} className="border-t border-gray-800 bg-gray-900 p-4">
         <div className="flex gap-2">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            className="flex-1 rounded-lg border border-gray-700 bg-gray-800 text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400" /* Updated input styles */
+            className="flex-1 rounded-lg border border-gray-700 bg-gray-800 text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
             disabled={isLoading || isListening}
           />
           <button
