@@ -1,11 +1,12 @@
 "use client"
-
+import 'regenerator-runtime/runtime'
 import { useState, useRef, useEffect } from "react"
 import { Send, Mic, MicOff } from "lucide-react"
 import { GoogleGenerativeAI } from "@google/generative-ai"
 import ReactMarkdown from 'react-markdown'
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
-// Initialize Gemini with api key
+// Initialize Gemini with API key
 const genAI = new GoogleGenerativeAI("AIzaSyCPz6mnZ3IxUtVTwpAKFqL8J9P107o7PwA")
 
 // Create chat model
@@ -43,24 +44,14 @@ interface ChatBotProps {
 }
 
 const formatResponse = (text: string) => {
-  // First, replace markdown headers with HTML headers
   text = text.replace(/^#\s+(.*)$/gm, '<h3 class="text-lg font-medium text-blue-400 mt-4">$1</h3>')
-  
-  // Replace numbered lists with proper formatting
   text = text.replace(/^\d+\.\s+(.*)$/gm, '<div class="mt-3"><strong>$1</strong></div>')
-  
-  // Replace bullet points with proper formatting
   text = text.replace(/^\*\s+(.*)$/gm, '<div class="ml-4 mt-2">• $1</div>')
-  
-  // Replace bold text
   text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-  
-  // Add paragraph breaks
   text = text.split('\n\n').map(paragraph => {
     if (paragraph.trim().startsWith('<')) return paragraph
     return `<p class="mt-3">${paragraph}</p>`
   }).join('')
-  
   return text
 }
 
@@ -73,21 +64,51 @@ export default function ChatBot({ onTalkingStateChange }: ChatBotProps) {
   ])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [isListening, setIsListening] = useState(false)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const recognitionRef = useRef<any>(null)
+  
+  const {
+    transcript,
+    listening,
+    resetTranscript,
+    browserSupportsSpeechRecognition,
+    isMicrophoneAvailable
+  } = useSpeechRecognition();
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  // Update input with transcript
+  useEffect(() => {
+    if (transcript) {
+      console.log("Transcript updated:", transcript);
+      setInput(transcript);
+    }
+  }, [transcript]);
+
+  if (!browserSupportsSpeechRecognition) {
+    return <p>Browser doesn't support speech recognition.</p>;
   }
 
-  useEffect(() => {
-    scrollToBottom()
-  }, [messages])
+  const toggleListening = () => {
+    if (listening) {
+      console.log("Stopping listening");
+      SpeechRecognition.stopListening();
+      // Keep the transcript in the input box when stopping
+    } else {
+      console.log("Starting listening");
+      resetTranscript();
+      SpeechRecognition.startListening({ 
+        continuous: true, 
+        language: 'en-US',
+        interimResults: true 
+      });
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!input.trim() || isLoading) return
+
+    // If still listening while submitting, stop listening
+    if (listening) {
+      SpeechRecognition.stopListening();
+    }
 
     const userMessage = input.trim()
     setInput("")
@@ -96,7 +117,6 @@ export default function ChatBot({ onTalkingStateChange }: ChatBotProps) {
     onTalkingStateChange(true)
 
     try {
-      // Fixed: Send message with correct format
       const result = await chat.sendMessage(userMessage)
       const assistantMessage = formatResponse(result.response.text())
 
@@ -116,26 +136,8 @@ export default function ChatBot({ onTalkingStateChange }: ChatBotProps) {
     } finally {
       setIsLoading(false)
       onTalkingStateChange(false)
+      resetTranscript() // Reset speech input after sending
     }
-  }
-
-  const startListening = () => {
-    setIsListening(true)
-    setInput('Listening...')
-
-    setTimeout(() => {
-      setIsListening(false)
-      setInput('What should I keep in Mind while Growing Tomatoes?')
-      // Auto submit after setting the input
-      setTimeout(() => {
-        handleSubmit({ preventDefault: () => {} } as React.FormEvent)
-      }, 100)
-    }, 2000)
-  }
-
-  const stopListening = () => {
-    setIsListening(false)
-    setInput('')
   }
 
   return (
@@ -152,9 +154,7 @@ export default function ChatBot({ onTalkingStateChange }: ChatBotProps) {
         {messages.map((message, index) => (
           <div
             key={index}
-            className={`flex ${
-              message.role === "user" ? "justify-end" : "justify-start"
-            }`}
+            className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
               className={`max-w-[80%] rounded-lg px-4 py-2 ${
@@ -173,7 +173,6 @@ export default function ChatBot({ onTalkingStateChange }: ChatBotProps) {
             </div>
           </div>
         )}
-        <div ref={messagesEndRef} />
       </div>
 
       <form onSubmit={handleSubmit} className="border-t border-gray-800 bg-gray-900 p-4">
@@ -183,30 +182,32 @@ export default function ChatBot({ onTalkingStateChange }: ChatBotProps) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             className="flex-1 rounded-lg border border-gray-700 bg-gray-800 text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
-            disabled={isLoading || isListening}
+            placeholder={listening ? "Listening..." : "Type your message..."}
           />
           <button
             type="button"
-            onClick={isListening ? stopListening : startListening}
-            disabled={isLoading}
+            onClick={toggleListening}
+            disabled={isLoading || !isMicrophoneAvailable}
             className={`rounded-lg p-2 text-white hover:opacity-80 disabled:opacity-50 ${
-              isListening ? 'bg-red-500' : 'bg-green-500'
+              listening ? 'bg-red-500' : 'bg-green-500'
             }`}
+            aria-label={listening ? "Stop listening" : "Start listening"}
           >
-            {isListening ? (
-              <MicOff className="h-5 w-5 animate-pulse" />
-            ) : (
-              <Mic className="h-5 w-5" />
-            )}
+            {listening ? <MicOff className="h-5 w-5 animate-pulse" /> : <Mic className="h-5 w-5" />}
           </button>
           <button
             type="submit"
-            disabled={isLoading || isListening}
+            disabled={isLoading || !input.trim()}
             className="rounded-lg bg-blue-500 p-2 text-white hover:bg-blue-600 disabled:opacity-50"
           >
             <Send className="h-5 w-5" />
           </button>
         </div>
+        {listening && (
+          <div className="text-xs text-gray-400 mt-1">
+            {transcript ? `Recognized: ${transcript}` : "Speak now..."}
+          </div>
+        )}
       </form>
     </div>
   )
