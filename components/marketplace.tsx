@@ -93,7 +93,13 @@ export default function Marketplace({ onBack }: MarketplaceProps) {
           <h2 className="ml-4 text-lg font-medium text-gray-200">Create Listing</h2>
         </div>
 
-        <div className="flex-1 p-6 overflow-auto">
+        <div className="flex-1 p-6 overflow-auto scrollbar-hide" 
+          style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}>
+          <style jsx>{`
+            div::-webkit-scrollbar {
+              display: none;
+            }
+          `}</style>
           <form className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-400 mb-2">Listing Type</label>
@@ -175,7 +181,13 @@ export default function Marketplace({ onBack }: MarketplaceProps) {
           <h2 className="ml-4 text-lg font-medium text-gray-200">Seller Dashboard</h2>
         </div>
 
-        <div className="flex-1 p-6 overflow-auto">
+        <div className="flex-1 p-6 overflow-auto scrollbar-hide"
+          style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}>
+          <style jsx>{`
+            div::-webkit-scrollbar {
+              display: none;
+            }
+          `}</style>
           <button
             onClick={() => setIsAddingListing(true)}
             className="w-full bg-gray-900 p-4 rounded-xl ring-1 ring-gray-800 hover:ring-green-500/50 transition-all mb-8"
@@ -215,7 +227,13 @@ export default function Marketplace({ onBack }: MarketplaceProps) {
       </div>
 
       {/* ...existing marketplace content... */}
-      <div className="flex-1 p-6 overflow-auto">
+      <div className="flex-1 p-6 overflow-auto scrollbar-hide"
+        style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}>
+        <style jsx>{`
+          div::-webkit-scrollbar {
+            display: none;
+          }
+        `}</style>
         {/* Categories */}
         <div className="grid grid-cols-2 gap-4 mb-8">
           <div className="bg-gray-900 p-4 rounded-xl ring-1 ring-gray-800">

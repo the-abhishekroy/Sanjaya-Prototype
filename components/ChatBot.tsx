@@ -140,7 +140,15 @@ export default function ChatBot({ onTalkingStateChange }: ChatBotProps) {
 
   return (
     <div className="flex h-full flex-col bg-gray-900">
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div 
+        className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide"
+        style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}
+      >
+        <style jsx>{`
+          div::-webkit-scrollbar {
+            display: none;
+          }
+        `}</style>
         {messages.map((message, index) => (
           <div
             key={index}

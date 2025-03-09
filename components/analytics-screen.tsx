@@ -7,7 +7,7 @@ interface AnalyticsScreenProps {
 
 export default function AnalyticsScreen({ onNavigate }: AnalyticsScreenProps) {
   return (
-    <div className="h-full w-full overflow-y-auto bg-gray-950 text-gray-200">
+    <div className="h-full w-full overflow-y-auto bg-gray-950 text-gray-200 scrollbar-hide">
       {/* Header with back button */}
       <div className="sticky top-0 z-10 bg-gray-950/80 backdrop-blur-sm border-b border-gray-800">
         <div className="flex items-center p-4">
@@ -89,15 +89,13 @@ export default function AnalyticsScreen({ onNavigate }: AnalyticsScreenProps) {
         {/* Weather Forecast */}
         <div className="col-span-2 p-4 bg-gray-900 rounded-xl border border-gray-800">
           <h3 className="text-lg font-medium text-rose-400">Weather Forecast</h3>
-          <div className="mt-4 flex space-x-4 overflow-x-auto pb-2 
-            [&::-webkit-scrollbar]:h-1.5
-            [&::-webkit-scrollbar-track]:rounded-full
-            [&::-webkit-scrollbar-track]:bg-gray-800
-            [&::-webkit-scrollbar-thumb]:rounded-full
-            [&::-webkit-scrollbar-thumb]:bg-rose-500/50
-            hover:[&::-webkit-scrollbar-thumb]:bg-rose-500
-            [scrollbar-width:thin]
-            [scrollbar-color:rgb(244_63_94_/_0.5)_rgb(31_41_55)]">
+          <div className="mt-4 flex space-x-4 overflow-x-auto pb-2 scrollbar-hide" 
+            style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}>
+            <style jsx>{`
+              div::-webkit-scrollbar {
+                display: none;
+              }
+            `}</style>
             {[
               { day: 'Today', temp: 28, icon: 'sun' },
               { day: 'Mon', temp: 27, icon: 'cloud-sun' },
