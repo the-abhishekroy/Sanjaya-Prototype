@@ -107,7 +107,8 @@ export default function Learn({ onBack }: LearnProps) {
         <h2 className="ml-4 text-lg font-medium text-gray-200">Learn & Earn</h2>
       </div>
 
-      <div className="flex-1 p-6 overflow-auto">
+      {/* Modified scrollable container */}
+      <div className="flex-1 p-6 overflow-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         {/* Course Categories */}
         <div className="grid grid-cols-2 gap-4 mb-8">
           <div className="bg-gray-900 p-4 rounded-xl ring-1 ring-indigo-500/30">

@@ -9,8 +9,10 @@ import Marketplace from "@/components/marketplace"
 import Automation from "@/components/automation"
 import Weather from "@/components/weather"
 import Learn from "@/components/learn"
+import SchemesScreen from "@/components/schemes-screen"
+import AnalyticsScreen from "@/components/analytics-screen"
 
-type ViewType = 'home' | 'chatbot' | 'marketplace' | 'automation' | 'weather' | 'learn';
+type ViewType = 'home' | 'chatbot' | 'marketplace' | 'automation' | 'weather' | 'learn' | 'schemes' | 'analytics';
 
 export default function Home() {
   const [scanComplete, setScanComplete] = useState(false)
@@ -55,6 +57,10 @@ export default function Home() {
         return <Weather onBack={() => handleNavigation('home')} />
       case 'learn':
         return <Learn onBack={() => handleNavigation('home')} />
+      case 'schemes':
+        return <SchemesScreen onNavigate={handleNavigation} />
+      case 'analytics':
+        return <AnalyticsScreen onNavigate={handleNavigation} />
       default:
         return <HomeScreen onNavigate={handleNavigation} />
     }

@@ -18,7 +18,7 @@ export default function Automation({ onBack }: AutomationProps) {
         <h2 className="ml-4 text-lg font-medium text-gray-200">Auto Crop Care</h2>
       </div>
 
-      <div className="flex-1 p-6 overflow-auto">
+      <div className="flex-1 p-6 overflow-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         {/* Status Overview Grid */}
         <div className="grid grid-cols-3 gap-4 mb-8">
           <div className="bg-gray-900 p-4 rounded-xl ring-1 ring-purple-500/30">
