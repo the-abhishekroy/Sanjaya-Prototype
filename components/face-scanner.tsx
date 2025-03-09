@@ -1,86 +1,164 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Camera } from "lucide-react"
+import { useState, useEffect, useRef } from "react"
+import * as faceapi from 'face-api.js'
 
 interface FaceScannerProps {
   onScanComplete: () => void
 }
 
 export default function FaceScanner({ onScanComplete }: FaceScannerProps) {
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const streamRef = useRef<MediaStream | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
   const [scanProgress, setScanProgress] = useState(0)
-  const [scanMessage, setScanMessage] = useState("Initializing face scan...")
+  const [message, setMessage] = useState("Loading face detection models...")
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (scanProgress < 100) {
-        setScanProgress((prev) => {
-          const newProgress = prev + 1
+    loadModelsAndStartCamera()
+    return () => stopCamera()
+  }, [])
 
-          if (newProgress === 25) {
-            setScanMessage("Detecting face...")
-          } else if (newProgress === 50) {
-            setScanMessage("Analyzing features...")
-          } else if (newProgress === 75) {
-            setScanMessage("Verifying identity...")
-          } else if (newProgress === 95) {
-            setScanMessage("Scan complete!")
-          }
+  const stopCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop())
+      streamRef.current = null
+    }
+  }
 
-          return newProgress
-        })
-      } else {
-        onScanComplete()
+  const loadModelsAndStartCamera = async () => {
+    try {
+      await Promise.all([
+        faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
+        faceapi.nets.faceLandmark68Net.loadFromUri('/models')
+      ])
+
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: 'user' } 
+      })
+      
+      streamRef.current = stream
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream
+        setMessage("Please look at the camera")
       }
-    }, 50)
 
-    return () => clearTimeout(timer)
-  }, [scanProgress, onScanComplete])
+      setIsLoading(false)
+    } catch (error) {
+      console.error('Error:', error)
+      setMessage("Error accessing camera. Please ensure camera permissions are granted.")
+    }
+  }
+
+  const handleVideoPlay = () => {
+    const detectFaces = async () => {
+      if (!videoRef.current || !canvasRef.current) return
+
+      // Get current video dimensions
+      const displaySize = {
+        width: videoRef.current.videoWidth,
+        height: videoRef.current.videoHeight
+      }
+
+      // Ensure canvas is properly sized
+      if (canvasRef.current.width !== displaySize.width || 
+          canvasRef.current.height !== displaySize.height) {
+        canvasRef.current.width = displaySize.width
+        canvasRef.current.height = displaySize.height
+      }
+
+      try {
+        const detection = await faceapi.detectSingleFace(
+          videoRef.current,
+          new faceapi.TinyFaceDetectorOptions()
+        ).withFaceLandmarks()
+
+        if (detection) {
+          const canvas = canvasRef.current
+          const ctx = canvas.getContext('2d')
+          
+          if (ctx) {
+            // Clear previous drawing
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+            // Draw new detections
+            const resizedDetection = faceapi.resizeResults(detection, displaySize)
+            faceapi.draw.drawDetections(canvas, [resizedDetection])
+            faceapi.draw.drawFaceLandmarks(canvas, [resizedDetection])
+
+            // Update progress
+            setScanProgress(prev => {
+              const newProgress = Math.min(prev + 2, 100)
+              if (newProgress === 100) {
+                setMessage("Face scan complete!")
+                setTimeout(() => {
+                  stopCamera()
+                  onScanComplete()
+                }, 500)
+                return 100
+              }
+              return newProgress
+            })
+          }
+        } else {
+          setMessage("No face detected. Please look directly at the camera.")
+        }
+
+        // Continue detection if not complete
+        if (scanProgress < 100) {
+          requestAnimationFrame(detectFaces)
+        }
+      } catch (error) {
+        console.error('Face detection error:', error)
+      }
+    }
+
+    detectFaces()
+  }
 
   return (
-    <div className="flex h-full flex-col items-center justify-center bg-gray-900 p-3 text-white">
-      <div className="mb-4 text-center">
-        <h2 className="mb-1 text-lg font-bold text-primary">Face Recognition</h2>
-        <p className="text-xs text-gray-400">Please look directly at the screen</p>
-      </div>
-
-      <div className="relative mb-4 h-36 w-36 overflow-hidden rounded-full border-4 border-primary">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <Camera size={50} className="text-primary opacity-50" />
+    <div className="flex h-full flex-col items-center justify-center bg-gray-950 p-6">
+      <div className="w-full max-w-md">
+        <div className="mb-6 text-center">
+          <h2 className="text-xl font-bold text-blue-400">Face Recognition</h2>
+          <p className="mt-2 text-sm text-gray-400">{message}</p>
         </div>
 
-        {/* Scanning animation */}
-        <div
-          className="absolute left-0 top-0 h-full w-full bg-primary opacity-20"
-          style={{
-            clipPath: `polygon(0 0, 100% 0, 100% ${scanProgress}%, 0 ${scanProgress}%)`,
-          }}
-        ></div>
-
-        {/* Scanning line */}
-        <div
-          className="absolute left-0 h-1 w-full bg-primary shadow-lg"
-          style={{
-            top: `${scanProgress}%`,
-            boxShadow: "0 0 10px 2px #0ea5e9",
-          }}
-        ></div>
-
-        {/* Face outline */}
-        <div className="absolute left-1/2 top-1/2 h-24 w-20 -translate-x-1/2 -translate-y-1/2 transform rounded-full border-2 border-dashed border-primary"></div>
-      </div>
-
-      <div className="mb-2 w-full max-w-xs">
-        <div className="mb-1 flex justify-between">
-          <span className="text-xs text-gray-400">Scanning...</span>
-          <span className="text-xs font-medium text-primary">{scanProgress}%</span>
+        <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-gray-900 ring-1 ring-gray-800">
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted
+            onPlay={handleVideoPlay}
+            className="h-full w-full object-cover"
+          />
+          <canvas
+            ref={canvasRef}
+            className="absolute inset-0 h-full w-full"
+          />
+          
+          {isLoading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80">
+              <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-400 border-t-transparent" />
+            </div>
+          )}
         </div>
-        <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-700">
-          <div className="h-full bg-primary transition-all duration-100" style={{ width: `${scanProgress}%` }}></div>
+
+        <div className="mt-6">
+          <div className="mb-2 flex justify-between text-sm">
+            <span className="text-gray-400">Scanning progress</span>
+            <span className="text-blue-400">{scanProgress}%</span>
+          </div>
+          <div className="h-2 overflow-hidden rounded-full bg-gray-800">
+            <div
+              className="h-full bg-blue-500 transition-all duration-300"
+              style={{ width: `${scanProgress}%` }}
+            />
+          </div>
         </div>
       </div>
-
-      <p className="text-center text-xs text-gray-300">{scanMessage}</p>
     </div>
   )
 }
