@@ -22,8 +22,10 @@ export default function KioskDevice({ children }: KioskDeviceProps) {
           <div className="relative h-[160px] w-[140px] rounded-xl bg-[#2c3038] p-4 shadow-lg ring-1 ring-[#404246]">
             {/* Sensor area */}
             <div className="mb-3 h-1/2 rounded-lg bg-gray-900 p-2 ring-1 ring-gray-700">
-              <div className="h-full w-full rounded-md bg-gray-800">
-                <div className="h-full w-full animate-pulse rounded-md bg-blue-500/10"></div>
+              <div className="h-full w-full rounded-md bg-gray-800 flex items-center justify-center">
+                <div className="flex flex-col items-center">
+                  <span className="text-gray-400 text-sm z-10">Insert Sample</span>
+                </div>
               </div>
             </div>
             {/* Status indicators */}
