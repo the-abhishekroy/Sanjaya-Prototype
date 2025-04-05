@@ -1,286 +1,227 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { GradientBackground } from './ui/gradient-background';
+import { SchemeCard } from './ui/scheme-card';
 
 interface SchemesScreenProps {
   onNavigate: (view: 'home' | 'chatbot' | 'marketplace' | 'automation' | 'learn' | 'schemes' | 'analytics') => void;
 }
 
+interface SchemeCardProps {
+  title: string;
+  description: string;
+  tags?: string[];
+  actionText: string;
+  date?: string;
+  eventType?: string;
+  alertType?: string;
+}
+
 export default function SchemesScreen({ onNavigate }: SchemesScreenProps) {
   const [activeTab, setActiveTab] = useState<'subsidies' | 'loans' | 'alerts' | 'insurance' | 'policies' | 'training'>('subsidies');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const tabs = [
+    { id: 'subsidies', icon: '💰', label: 'Subsidies' },
+    { id: 'loans', icon: '🏦', label: 'Loans' },
+    { id: 'alerts', icon: '⚠️', label: 'Alerts' },
+    { id: 'insurance', icon: '🛡️', label: 'Insurance' },
+    { id: 'policies', icon: '📜', label: 'Policies' },
+    { id: 'training', icon: '🎓', label: 'Training' }
+  ];
 
   return (
-    <div className="h-full w-full overflow-y-auto bg-gray-950 text-gray-200 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-      {/* Header with back button */}
-      <div className="sticky top-0 z-10 bg-gray-950/80 backdrop-blur-sm border-b border-gray-800">
-        <div className="flex items-center p-4">
-          <button 
-            onClick={() => onNavigate('home')}
-            className="p-2 hover:bg-gray-800 rounded-lg"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <h1 className="ml-4 text-xl font-semibold">Government Schemes</h1>
-        </div>
+    <div className="fixed inset-0 flex flex-col">
+      <GradientBackground />
 
-        {/* Fixed Tab Navigation Grid */}
-        <div className="grid grid-cols-3 gap-2 px-4 pb-2">
-          <button 
-            onClick={() => setActiveTab('subsidies')}
-            className={`px-3 py-2 rounded-lg text-sm text-center ${activeTab === 'subsidies' ? 'bg-amber-500/20 text-amber-400' : 'hover:bg-gray-800'}`}
-          >
-            Subsidies
-          </button>
-          <button 
-            onClick={() => setActiveTab('loans')}
-            className={`px-3 py-2 rounded-lg text-sm text-center ${activeTab === 'loans' ? 'bg-amber-500/20 text-amber-400' : 'hover:bg-gray-800'}`}
-          >
-            Loans
-          </button>
-          <button 
-            onClick={() => setActiveTab('alerts')}
-            className={`px-3 py-2 rounded-lg text-sm text-center ${activeTab === 'alerts' ? 'bg-amber-500/20 text-amber-400' : 'hover:bg-gray-800'}`}
-          >
-            Alerts
-          </button>
-          <button 
-            onClick={() => setActiveTab('insurance')}
-            className={`px-3 py-2 rounded-lg text-sm text-center ${activeTab === 'insurance' ? 'bg-amber-500/20 text-amber-400' : 'hover:bg-gray-800'}`}
-          >
-            Insurance
-          </button>
-          <button 
-            onClick={() => setActiveTab('policies')}
-            className={`px-3 py-2 rounded-lg text-sm text-center ${activeTab === 'policies' ? 'bg-amber-500/20 text-amber-400' : 'hover:bg-gray-800'}`}
-          >
-            Policies
-          </button>
-          <button 
-            onClick={() => setActiveTab('training')}
-            className={`px-3 py-2 rounded-lg text-sm text-center ${activeTab === 'training' ? 'bg-amber-500/20 text-amber-400' : 'hover:bg-gray-800'}`}
-          >
-            Training
-          </button>
+      {/* Premium Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative z-10"
+      >
+        <div className="backdrop-blur-sm bg-gray-900/50 border-b border-gray-800/50">
+          <div className="max-w-6xl mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <button 
+                  onClick={() => onNavigate('home')}
+                  className="p-2 hover:bg-gray-800/50 rounded-lg transition-all"
+                >
+                  <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <div>
+                  <h1 className="text-xl font-semibold bg-gradient-to-r from-rose-400 to-rose-600 bg-clip-text text-transparent">
+                    Government Schemes
+                  </h1>
+                  <p className="text-sm text-gray-400">Discover available support programs</p>
+                </div>
+              </div>
+
+              {/* Search Bar */}
+              <div className="relative max-w-xs w-full">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search schemes..."
+                  className="w-full bg-gray-800/50 text-gray-200 rounded-lg px-4 py-2 
+                           pl-10 ring-1 ring-gray-700 focus:ring-rose-500/50 
+                           transition-all duration-200"
+                />
+                <svg className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+            </div>
+
+            {/* Tab Navigation */}
+            <div className="mt-4 flex space-x-2 overflow-x-auto scrollbar-hide">
+              {tabs.map((tab) => (
+                <motion.button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as typeof activeTab)}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`
+                    flex items-center px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap
+                    transition-all duration-200 ease-in-out
+                    ${activeTab === tab.id 
+                      ? 'bg-rose-500/10 text-rose-400 ring-1 ring-rose-500/50' 
+                      : 'text-gray-400 hover:bg-gray-800/50 hover:text-gray-200'}
+                  `}
+                >
+                  <span className="mr-2">{tab.icon}</span>
+                  {tab.label}
+                </motion.button>
+              ))}
+            </div>
+          </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Content Area */}
-      <div className="p-4 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-        {/* Subsidies & Grants Tab */}
-        {activeTab === 'subsidies' && (
-          <div className="space-y-4 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-            <div className="p-4 bg-gray-900 rounded-xl border border-gray-800">
-              <h3 className="text-lg font-medium text-amber-400">PM-KISAN Scheme</h3>
-              <p className="mt-2 text-sm text-gray-400">₹6,000 annual income support in three installments</p>
-              <button className="mt-4 px-4 py-2 bg-amber-500/10 text-amber-400 rounded-lg hover:bg-amber-500/20">
-                Check Eligibility
-              </button>
-            </div>
-
-            <div className="p-4 bg-gray-900 rounded-xl border border-gray-800">
-              <h3 className="text-lg font-medium text-amber-400">National Mission For Sustainable Agriculture</h3>
-              <p className="mt-2 text-sm text-gray-400">Up to ₹50,000 for rainwater harvesting structures</p>
-              <button className="mt-4 px-4 py-2 bg-amber-500/10 text-amber-400 rounded-lg hover:bg-amber-500/20">
-                Apply Now
-              </button>
-            </div>
-
-            <div className="p-4 bg-gray-900 rounded-xl border border-gray-800">
-              <h3 className="text-lg font-medium text-amber-400">Solar Pump Subsidy Scheme</h3>
-              <p className="mt-2 text-sm text-gray-400">90% subsidy on solar pump installation</p>
-              <button className="mt-4 px-4 py-2 bg-amber-500/10 text-amber-400 rounded-lg hover:bg-amber-500/20">
-                View Details
-              </button>
-            </div>
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        className="relative flex-1 overflow-auto scrollbar-hide"
+      >
+        <div className="max-w-6xl mx-auto p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {activeTab === 'subsidies' && (
+              <>
+                <SchemeCard
+                  title="PM-KISAN Scheme"
+                  description="₹6,000 annual income support in three installments"
+                  tags={['Direct Benefit', 'All Farmers']}
+                  actionText="Check Eligibility"
+                />
+                <SchemeCard
+                  title="National Mission For Sustainable Agriculture"
+                  description="Up to ₹50,000 for rainwater harvesting structures"
+                  actionText="Apply Now"
+                />
+                <SchemeCard
+                  title="Solar Pump Subsidy Scheme"
+                  description="90% subsidy on solar pump installation"
+                  actionText="View Details"
+                />
+              </>
+            )}
+            {activeTab === 'loans' && (
+              <>
+                <SchemeCard
+                  title="Kisan Credit Card"
+                  description="Interest rate: 4% per annum | Limit up to ₹3 lakhs"
+                  tags={['No Collateral', 'Quick Approval']}
+                  actionText="Apply for KCC"
+                />
+                <SchemeCard
+                  title="Agriculture Infrastructure Fund"
+                  description="Long term debt financing up to ₹2 crore"
+                  tags={['3% Interest Subvention']}
+                  actionText="Check Details"
+                />
+              </>
+            )}
+            {activeTab === 'alerts' && (
+              <>
+                <SchemeCard
+                  title="Heavy Rainfall Alert"
+                  description="Expected in your region within next 48 hours"
+                  actionText="View Precautions"
+                  alertType="red"
+                />
+                <SchemeCard
+                  title="Pest Alert: Army Worm"
+                  description="Detected in nearby districts. Take preventive measures."
+                  actionText="View Solutions"
+                  alertType="orange"
+                />
+              </>
+            )}
+            {activeTab === 'insurance' && (
+              <>
+                <SchemeCard
+                  title="Pradhan Mantri Fasal Bima Yojana"
+                  description="Premium: Only 2% for Kharif crops"
+                  tags={['Natural Fire & Lightning coverage', 'Storm, Hailstorm, Cyclone coverage']}
+                  actionText="Enroll Now"
+                />
+                <SchemeCard
+                  title="Weather Based Crop Insurance"
+                  description="Protection against weather uncertainties"
+                  actionText="Calculate Premium"
+                />
+              </>
+            )}
+            {activeTab === 'policies' && (
+              <>
+                <SchemeCard
+                  title="MSP Increase for Rabi Crops"
+                  description="Government announces higher MSP for six Rabi crops"
+                  actionText="Read More"
+                  date="2 days ago"
+                />
+                <SchemeCard
+                  title="New Organic Farming Policy"
+                  description="Additional incentives for organic farming certification"
+                  actionText="View Benefits"
+                  date="1 week ago"
+                />
+              </>
+            )}
+            {activeTab === 'training' && (
+              <>
+                <SchemeCard
+                  title="Modern Farming Techniques Workshop"
+                  description="Learn latest farming technologies and sustainable practices"
+                  tags={['Mar 15, 2025 • Free Entry', 'Agricultural Research Center, Guwahati']}
+                  actionText="Register Now"
+                  eventType="upcoming"
+                />
+                <SchemeCard
+                  title="Organic Certification Training"
+                  description="Complete guide to organic farming certification process"
+                  tags={['4 Weeks', 'Certificate']}
+                  actionText="Enroll Free"
+                  eventType="online"
+                />
+                <SchemeCard
+                  title="Kisan Mela 2025"
+                  description="Annual agricultural exhibition with latest farming equipment"
+                  tags={['Apr 1-3, 2025 • Exhibition', 'State Fair Ground, Guwahati']}
+                  actionText="Get Pass"
+                  eventType="3 days"
+                />
+              </>
+            )}
           </div>
-        )}
-
-        {/* Loan Assistance Tab */}
-        {activeTab === 'loans' && (
-          <div className="space-y-4 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-            <div className="p-4 bg-gray-900 rounded-xl border border-gray-800">
-              <h3 className="text-lg font-medium text-amber-400">Kisan Credit Card</h3>
-              <p className="mt-2 text-sm text-gray-400">Interest rate: 4% per annum | Limit up to ₹3 lakhs</p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <span className="px-2 py-1 text-xs bg-amber-500/10 text-amber-400 rounded-full">No Collateral</span>
-                <span className="px-2 py-1 text-xs bg-amber-500/10 text-amber-400 rounded-full">Quick Approval</span>
-              </div>
-              <button className="mt-4 px-4 py-2 bg-amber-500/10 text-amber-400 rounded-lg hover:bg-amber-500/20">
-                Apply for KCC
-              </button>
-            </div>
-
-            <div className="p-4 bg-gray-900 rounded-xl border border-gray-800">
-              <h3 className="text-lg font-medium text-amber-400">Agriculture Infrastructure Fund</h3>
-              <p className="mt-2 text-sm text-gray-400">Long term debt financing up to ₹2 crore</p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <span className="px-2 py-1 text-xs bg-amber-500/10 text-amber-400 rounded-full">3% Interest Subvention</span>
-              </div>
-              <button className="mt-4 px-4 py-2 bg-amber-500/10 text-amber-400 rounded-lg hover:bg-amber-500/20">
-                Check Details
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Emergency Alerts Tab */}
-        {activeTab === 'alerts' && (
-          <div className="space-y-4 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-            <div className="p-4 bg-red-500/10 rounded-xl border border-red-900">
-              <div className="flex items-center">
-                <svg className="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-                <h3 className="ml-2 text-lg font-medium text-red-400">Heavy Rainfall Alert</h3>
-              </div>
-              <p className="mt-2 text-sm text-gray-400">Expected in your region within next 48 hours</p>
-              <button className="mt-4 px-4 py-2 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500/20">
-                View Precautions
-              </button>
-            </div>
-
-            <div className="p-4 bg-orange-500/10 rounded-xl border border-orange-900">
-              <div className="flex items-center">
-                <svg className="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                <h3 className="ml-2 text-lg font-medium text-orange-400">Pest Alert: Army Worm</h3>
-              </div>
-              <p className="mt-2 text-sm text-gray-400">Detected in nearby districts. Take preventive measures.</p>
-              <button className="mt-4 px-4 py-2 bg-orange-500/10 text-orange-400 rounded-lg hover:bg-orange-500/20">
-                View Solutions
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Crop Insurance Tab */}
-        {activeTab === 'insurance' && (
-          <div className="space-y-4 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-            <div className="p-4 bg-gray-900 rounded-xl border border-gray-800">
-              <h3 className="text-lg font-medium text-amber-400">Pradhan Mantri Fasal Bima Yojana</h3>
-              <p className="mt-2 text-sm text-gray-400">Premium: Only 2% for Kharif crops</p>
-              <div className="mt-3 space-y-2">
-                <div className="flex items-center text-sm text-gray-400">
-                  <svg className="w-5 h-5 mr-2 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span>Natural Fire & Lightning coverage</span>
-                </div>
-                <div className="flex items-center text-sm text-gray-400">
-                  <svg className="w-5 h-5 mr-2 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span>Storm, Hailstorm, Cyclone coverage</span>
-                </div>
-              </div>
-              <button className="mt-4 px-4 py-2 bg-amber-500/10 text-amber-400 rounded-lg hover:bg-amber-500/20">
-                Enroll Now
-              </button>
-            </div>
-
-            <div className="p-4 bg-gray-900 rounded-xl border border-gray-800">
-              <h3 className="text-lg font-medium text-amber-400">Weather Based Crop Insurance</h3>
-              <p className="mt-2 text-sm text-gray-400">Protection against weather uncertainties</p>
-              <button className="mt-4 px-4 py-2 bg-amber-500/10 text-amber-400 rounded-lg hover:bg-amber-500/20">
-                Calculate Premium
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Policy Updates Tab */}
-        {activeTab === 'policies' && (
-          <div className="space-y-4 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-            <div className="p-4 bg-gray-900 rounded-xl border border-gray-800">
-              <div className="flex justify-between items-start">
-                <h3 className="text-lg font-medium text-amber-400">MSP Increase for Rabi Crops</h3>
-                <span className="text-xs text-gray-400">2 days ago</span>
-              </div>
-              <p className="mt-2 text-sm text-gray-400">Government announces higher MSP for six Rabi crops</p>
-              <button className="mt-4 px-4 py-2 bg-amber-500/10 text-amber-400 rounded-lg hover:bg-amber-500/20">
-                Read More
-              </button>
-            </div>
-
-            <div className="p-4 bg-gray-900 rounded-xl border border-gray-800">
-              <div className="flex justify-between items-start">
-                <h3 className="text-lg font-medium text-amber-400">New Organic Farming Policy</h3>
-                <span className="text-xs text-gray-400">1 week ago</span>
-              </div>
-              <p className="mt-2 text-sm text-gray-400">Additional incentives for organic farming certification</p>
-              <button className="mt-4 px-4 py-2 bg-amber-500/10 text-amber-400 rounded-lg hover:bg-amber-500/20">
-                View Benefits
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Training & Events Tab */}
-        {activeTab === 'training' && (
-          <div className="space-y-4 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-            <div className="p-4 bg-gray-900 rounded-xl border border-gray-800">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-lg font-medium text-amber-400">Modern Farming Techniques Workshop</h3>
-                  <p className="text-xs text-emerald-400 mt-1">Mar 15, 2025 • Free Entry</p>
-                </div>
-                <span className="px-2 py-1 text-xs bg-emerald-500/10 text-emerald-400 rounded-full">Upcoming</span>
-              </div>
-              <p className="mt-2 text-sm text-gray-400">Learn latest farming technologies and sustainable practices</p>
-              <div className="mt-3 flex items-center text-sm text-gray-400">
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                <span>Agricultural Research Center, Guwahati</span>
-              </div>
-              <button className="mt-4 px-4 py-2 bg-amber-500/10 text-amber-400 rounded-lg hover:bg-amber-500/20">
-                Register Now
-              </button>
-            </div>
-
-            <div className="p-4 bg-gray-900 rounded-xl border border-gray-800">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-lg font-medium text-amber-400">Organic Certification Training</h3>
-                  <p className="text-xs text-blue-400 mt-1">Online • Self-Paced</p>
-                </div>
-                <span className="px-2 py-1 text-xs bg-blue-500/10 text-blue-400 rounded-full">Online</span>
-              </div>
-              <p className="mt-2 text-sm text-gray-400">Complete guide to organic farming certification process</p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <span className="px-2 py-1 text-xs bg-amber-500/10 text-amber-400 rounded-full">4 Weeks</span>
-                <span className="px-2 py-1 text-xs bg-amber-500/10 text-amber-400 rounded-full">Certificate</span>
-              </div>
-              <button className="mt-4 px-4 py-2 bg-amber-500/10 text-amber-400 rounded-lg hover:bg-amber-500/20">
-                Enroll Free
-              </button>
-            </div>
-
-            <div className="p-4 bg-gray-900 rounded-xl border border-gray-800">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-lg font-medium text-amber-400">Kisan Mela 2025</h3>
-                  <p className="text-xs text-purple-400 mt-1">Apr 1-3, 2025 • Exhibition</p>
-                </div>
-                <span className="px-2 py-1 text-xs bg-purple-500/10 text-purple-400 rounded-full">3 Days</span>
-              </div>
-              <p className="mt-2 text-sm text-gray-400">Annual agricultural exhibition with latest farming equipment</p>
-              <div className="mt-3 flex items-center text-sm text-gray-400">
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                <span>State Fair Ground, Guwahati</span>
-              </div>
-              <button className="mt-4 px-4 py-2 bg-amber-500/10 text-amber-400 rounded-lg hover:bg-amber-500/20">
-                Get Pass
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
+        </div>
+      </motion.div>
     </div>
   );
 }

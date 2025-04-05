@@ -1,130 +1,145 @@
 import Link from 'next/link'
+import { motion } from 'framer-motion' // Add framer-motion for animations
 
 interface HomeScreenProps {
   onNavigate: (view: 'home' | 'chatbot' | 'marketplace' | 'automation' | 'learn' | 'schemes' | 'analytics') => void;
 }
 
+const navigationButtons = [
+  {
+    id: 'chatbot',
+    title: 'Ask Crop Suggestion',
+    description: 'AI-powered crop recommendations',
+    icon: <svg className="w-7 h-7 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} 
+                  d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+          </svg>,
+    color: 'blue'
+  },
+  {
+    id: 'marketplace',
+    title: 'Marketplace',
+    description: 'Buy and sell farm products',
+    icon: <svg className="w-7 h-7 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} 
+                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          </svg>,
+    color: 'green'
+  },
+  {
+    id: 'automation',
+    title: 'Auto Crop Care',
+    description: 'Automated farming solutions',
+    icon: <svg className="w-7 h-7 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} 
+                  d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
+          </svg>,
+    color: 'purple'
+  },
+  {
+    id: 'learn',
+    title: 'Learn',
+    description: 'Educational farming content',
+    icon: <svg className="w-7 h-7 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} 
+                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>,
+    color: 'amber'
+  },
+  {
+    id: 'schemes',
+    title: 'Schemes',
+    description: 'Government farming programs',
+    icon: <svg className="w-7 h-7 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} 
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>,
+    color: 'rose'
+  },
+  {
+    id: 'analytics',
+    title: 'Analytics',
+    description: 'Farm data insights',
+    icon: <svg className="w-7 h-7 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} 
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>,
+    color: 'cyan'
+  }
+]
+
 export default function HomeScreen({ onNavigate }: HomeScreenProps) {
   return (
-    <div className="w-full h-full overflow-y-auto bg-gray-950 text-gray-200 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-      <div className="p-6 pb-12">
-        {/* Welcome header */}
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-blue-400">Welcome to Sanjaya</h1>
-          <p className="text-sm text-gray-400 mt-2">Your Smart Farming Assistant</p>
+    <div className="fixed inset-0 bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 text-gray-200">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+
+      <div className="relative h-full overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+        <div className="p-6 pb-12">
+          {/* Enhanced Welcome Header */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center mb-12"
+          >
+            <div className="inline-block">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 bg-clip-text text-transparent">
+                Welcome to Sanjaya
+              </h1>
+              <div className="mt-2 flex items-center justify-center space-x-2">
+                <span className="w-12 h-0.5 bg-gradient-to-r from-transparent via-gray-700 to-transparent"></span>
+                <p className="text-sm text-gray-400">Your Smart Farming Assistant</p>
+                <span className="w-12 h-0.5 bg-gradient-to-r from-transparent via-gray-700 to-transparent"></span>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Enhanced Grid Container */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {navigationButtons.map((button, index) => (
+              <motion.button 
+                key={button.id}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.1 }}
+                onClick={() => onNavigate(button.id as any)} 
+                className="group text-left"
+              >
+                <div className={`h-44 rounded-2xl bg-gradient-to-br from-gray-900 to-gray-800 p-5 
+                              ring-1 ring-gray-800 hover:ring-2 hover:ring-${button.color}-500/50 
+                              transition-all duration-300 ease-out
+                              hover:shadow-lg hover:shadow-${button.color}-500/10`}>
+                  <div className="h-full flex flex-col items-center justify-center space-y-4">
+                    <div className={`w-14 h-14 rounded-xl bg-${button.color}-500/10 flex items-center justify-center
+                                  group-hover:bg-${button.color}-500/20 transition-colors duration-300
+                                  backdrop-blur-xl ring-1 ring-${button.color}-500/20`}>
+                      {button.icon}
+                    </div>
+                    <div className="text-center">
+                      <span className={`text-lg font-medium bg-gradient-to-r from-${button.color}-400 to-${button.color}-500 
+                                     bg-clip-text text-transparent group-hover:to-${button.color}-400`}>
+                        {button.title}
+                      </span>
+                      <p className="text-xs text-gray-400 mt-2">{button.description}</p>
+                    </div>
+                  </div>
+                </div>
+              </motion.button>
+            ))}
+          </div>
+
+          {/* Footer Area */}
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="mt-12 text-center"
+          >
+            <p className="text-xs text-gray-500">
+              © 2024 Sanjaya. All rights reserved.
+            </p>
+          </motion.div>
         </div>
-        {/* Grid container with gap between rows */}
-        <div className="grid grid-cols-2 gap-8">
-          {/* Ask Crop Suggestion */}
-          <button 
-            onClick={() => onNavigate('chatbot')} 
-            className="group text-left"
-          >
-            <div className="h-40 rounded-2xl bg-gray-900 p-4 ring-1 ring-gray-800 hover:ring-blue-500/50 transition-all">
-              <div className="h-full flex flex-col items-center justify-center space-y-3">
-                <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
-                  <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                  </svg>
-                </div>
-                <span className="text-lg font-medium">Ask Crop Suggestion</span>
-                <span className="text-xs text-gray-400">AI-powered crop recommendations</span>
-              </div>
-            </div>
-          </button>
-
-          {/* Connect to Buyers */}
-          <button 
-            onClick={() => onNavigate('marketplace')} 
-            className="group text-left"
-          >
-            <div className="h-40 rounded-2xl bg-gray-900 p-4 ring-1 ring-gray-800 hover:ring-green-500/50 transition-all">
-              <div className="h-full flex flex-col items-center justify-center space-y-3">
-                <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center group-hover:bg-green-500/20 transition-colors">
-                  <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                </div>
-                <span className="text-lg font-medium">Connect to Buyers & Sellers</span>
-                <span className="text-xs text-gray-400">Trade equipment & produce</span>
-              </div>
-            </div>
-          </button>
-
-          {/* Auto Crop Care */}
-          <button 
-            onClick={() => onNavigate('automation')} 
-            className="group text-left"
-          >
-            <div className="h-40 rounded-2xl bg-gray-900 p-4 ring-1 ring-gray-800 hover:ring-purple-500/50 transition-all">
-              <div className="h-full flex flex-col items-center justify-center space-y-3">
-                <div className="w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
-                  <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                  </svg>
-                </div>
-                <span className="text-lg font-medium">Auto Crop Care</span>
-                <span className="text-xs text-gray-400">Smart irrigation & monitoring</span>
-              </div>
-            </div>
-          </button>
-
-          {/* Learn & Earn */}
-          <button 
-            onClick={() => onNavigate('learn')} 
-            className="group text-left"
-          >
-            <div className="h-40 rounded-2xl bg-gray-900 p-4 ring-1 ring-gray-800 hover:ring-indigo-500/50 transition-all">
-              <div className="h-full flex flex-col items-center justify-center space-y-3">
-                <div className="w-12 h-12 rounded-full bg-indigo-500/10 flex items-center justify-center group-hover:bg-indigo-500/20 transition-colors">
-                  <svg className="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <span className="text-lg font-medium">Learn & Earn</span>
-                <span className="text-xs text-gray-400">Watch tutorials & earn rewards</span>
-              </div>
-            </div>
-          </button>
-
-          {/* Government Schemes & Alerts */}
-          <button 
-            onClick={() => onNavigate('schemes')} 
-            className="group text-left"
-          >
-            <div className="h-40 rounded-2xl bg-gray-900 p-4 ring-1 ring-gray-800 hover:ring-amber-500/50 transition-all">
-              <div className="h-full flex flex-col items-center justify-center space-y-3">
-                <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center group-hover:bg-amber-500/20 transition-colors">
-                  <svg className="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                  </svg>
-                </div>
-                <span className="text-lg font-medium">Government Support</span>
-                <span className="text-xs text-gray-400">Subsidies, loans & alerts</span>
-              </div>
-            </div>
-          </button>
-
-          {/* Farmer's Analytics Dashboard */}
-          <button 
-            onClick={() => onNavigate('analytics')} 
-            className="group text-left"
-          >
-            <div className="h-40 rounded-2xl bg-gray-900 p-4 ring-1 ring-gray-800 hover:ring-rose-500/50 transition-all">
-              <div className="h-full flex flex-col items-center justify-center space-y-3">
-                <div className="w-12 h-12 rounded-full bg-rose-500/10 flex items-center justify-center group-hover:bg-rose-500/20 transition-colors">
-                  <svg className="w-6 h-6 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
-                </div>
-                <span className="text-lg font-medium">Farm Analytics</span>
-                <span className="text-xs text-gray-400">Track farm performance</span>
-              </div>
-            </div>
-          </button>
-        </div>
-        {/* Add bottom padding for better scrolling experience */}
-        <div className="h-12"></div>
       </div>
     </div>
   )

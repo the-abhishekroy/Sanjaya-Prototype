@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import KioskDevice from "@/components/kiosk-device"
 import FaceScanner from "@/components/face-scanner"
 import HomeScreen from "@/components/home-screen"
 import ChatInterface from "@/components/chat-interface"
@@ -23,7 +22,7 @@ export default function Home() {
     setScanComplete(true)
     setTimeout(() => {
       setShowHome(true)
-    }, 1000)
+    }, 500)
   }
 
   const handleNavigation = (view: ViewType) => {
@@ -70,9 +69,7 @@ export default function Home() {
     <main className="relative flex min-h-screen flex-col items-center justify-center custom-background overflow-hidden">
       <div className="absolute inset-0 bg-black/20" />
       <div className="relative w-full max-w-6xl">
-        <KioskDevice>
           {renderContent()}
-        </KioskDevice>
       </div>
     </main>
   )
